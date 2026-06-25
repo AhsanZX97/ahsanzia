@@ -1,7 +1,15 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 const ACCENT = 'oklch(0.62 0.18 40)'
-const EMAIL = 'hello@ahsanzia.dev'
+const GREEN  = 'oklch(0.72 0.16 150)'
+const EMAIL  = 'hello@ahsanzia.dev'
+
+const TESTS = [
+  { name: 'builds web apps',       time: '0.18s' },
+  { name: 'ships mobile apps',     time: '0.27s' },
+  { name: 'automates the QA',      time: '0.09s' },
+  { name: 'replies to your email', time: '0.04s' },
+]
 
 const s = {
   page: {
@@ -15,15 +23,8 @@ const s = {
     color: 'oklch(0.235 0.012 255)',
     fontFamily: "'Space Grotesk', sans-serif",
   },
-  mono: {
-    fontFamily: "'IBM Plex Mono', monospace",
-  },
-  muted: {
-    color: 'oklch(0.5 0.01 255)',
-  },
-  border: {
-    borderColor: 'oklch(0.88 0.006 255)',
-  },
+  mono: { fontFamily: "'IBM Plex Mono', monospace" },
+  muted: { color: 'oklch(0.5 0.01 255)' },
 }
 
 export default function App() {
@@ -68,21 +69,7 @@ export default function App() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', borderTop: '1px solid oklch(0.88 0.006 255)' }}>
-          {[
-            { n: '01', title: 'Web Development', sub: 'Modern web apps, front to back.' },
-            { n: '02', title: 'App Development', sub: 'Native-feeling mobile, shipped.' },
-            { n: '03', title: 'QA & Automation',  sub: "Tests that catch it before your users do." },
-          ].map(({ n, title, sub }) => (
-            <div key={n} style={{ display: 'flex', gap: 16, alignItems: 'baseline', padding: 'clamp(14px, 1.6vw, 20px) 0', borderBottom: '1px solid oklch(0.88 0.006 255)' }}>
-              <span style={{ ...s.mono, fontSize: 12, color: ACCENT, minWidth: 24 }}>{n}</span>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                <span style={{ fontSize: 'clamp(17px, 1.5vw, 21px)', fontWeight: 600, letterSpacing: '-0.01em' }}>{title}</span>
-                <span style={{ fontSize: 14, ...s.muted }}>{sub}</span>
-              </div>
-            </div>
-          ))}
-        </div>
+        <TestRunner />
       </main>
 
       <footer style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 28, flexWrap: 'wrap' }}>
@@ -91,9 +78,7 @@ export default function App() {
             Let's work together
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
-            <EmailLink href={`mailto:${EMAIL}`} accent={ACCENT}>
-              {EMAIL}
-            </EmailLink>
+            <EmailLink href={`mailto:${EMAIL}`}>{EMAIL}</EmailLink>
             <CopyButton onClick={copyEmail} copied={copied} />
           </div>
         </div>
@@ -101,8 +86,8 @@ export default function App() {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, ...s.mono, fontSize: 12, letterSpacing: '0.04em', ...s.muted, textAlign: 'right' }}>
           <span>Remote · Available worldwide</span>
           <div style={{ display: 'flex', gap: 14 }}>
-            <FooterLink href="https://github.com/ahsanzia" accent={ACCENT}>GitHub ↗</FooterLink>
-            <FooterLink href="https://linkedin.com/in/ahsanzia" accent={ACCENT}>LinkedIn ↗</FooterLink>
+            <FooterLink href="https://github.com/ahsanzia">GitHub ↗</FooterLink>
+            <FooterLink href="https://linkedin.com/in/ahsanzia">LinkedIn ↗</FooterLink>
           </div>
         </div>
       </footer>
@@ -110,7 +95,86 @@ export default function App() {
   )
 }
 
-function EmailLink({ href, accent, children }: { href: string; accent: string; children: React.ReactNode }) {
+function TestRunner() {
+  const [passed,  setPassed]  = useState(0)
+  const [running, setRunning] = useState(-1)
+  const [done,    setDone]    = useState(false)
+  const ct = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    ct.current = setTimeout(cycle, 700)
+    return () => { if (ct.current) clearTimeout(ct.current) }
+  }, [])
+
+  function cycle() {
+    setPassed(0); setRunning(-1); setDone(false)
+    let i = 0
+    function step() {
+      if (i >= TESTS.length) {
+        setRunning(-1); setDone(true)
+        ct.current = setTimeout(cycle, 3800)
+        return
+      }
+      setRunning(i)
+      ct.current = setTimeout(() => {
+        setPassed(i + 1); setRunning(-1)
+        i++
+        ct.current = setTimeout(step, 240)
+      }, 480)
+    }
+    ct.current = setTimeout(step, 500)
+  }
+
+  const statusLabel = done ? 'PASS' : 'RUNS'
+  const statusColor = done ? GREEN : ACCENT
+  const failLine    = done ? '0 failing · 0.58s' : 'running…'
+
+  return (
+    <div style={{ width: '100%', maxWidth: 440, marginLeft: 'auto', background: 'oklch(0.205 0.012 255)', borderRadius: 8, overflow: 'hidden', fontFamily: "'IBM Plex Mono', monospace", boxShadow: '0 22px 48px -28px oklch(0.2 0.02 255 / 0.55)' }}>
+      {/* title bar */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 16px', borderBottom: '1px solid oklch(0.3 0.01 255)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ display: 'flex', gap: 6 }}>
+            <span style={{ width: 9, height: 9, borderRadius: '50%', background: 'oklch(0.55 0.13 30)' }} />
+            <span style={{ width: 9, height: 9, borderRadius: '50%', background: 'oklch(0.62 0.1 90)' }} />
+            <span style={{ width: 9, height: 9, borderRadius: '50%', background: 'oklch(0.62 0.11 150)' }} />
+          </span>
+          <span style={{ fontSize: 12, color: 'oklch(0.6 0.01 255)' }}>ahsan.test.ts</span>
+        </div>
+        <span style={{ fontSize: 10, letterSpacing: '0.14em', padding: '3px 9px', borderRadius: 4, color: statusColor, border: `1px solid ${statusColor}`, transition: 'color .35s, border-color .35s' }}>
+          {statusLabel}
+        </span>
+      </div>
+
+      {/* test rows */}
+      <div style={{ padding: '18px 16px 8px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {TESTS.map((t, i) => {
+          const status = i < passed ? 'pass' : i === running ? 'run' : 'pending'
+          const icon      = status === 'pass' ? '✓' : status === 'run' ? '▸' : '·'
+          const iconColor = status === 'pass' ? GREEN : status === 'run' ? ACCENT : 'oklch(0.45 0.01 255)'
+          const nameColor = status === 'pending' ? 'oklch(0.5 0.01 255)' : 'oklch(0.85 0.005 255)'
+          const timeColor = status === 'pass' ? 'oklch(0.62 0.01 255)' : 'oklch(0.4 0.01 255)'
+          return (
+            <div key={t.name} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13 }}>
+              <span style={{ width: 14, textAlign: 'center', color: iconColor, transition: 'color .35s' }}>{icon}</span>
+              <span style={{ color: nameColor, transition: 'color .35s', whiteSpace: 'nowrap' }}>{t.name}</span>
+              <span style={{ flex: 1, borderBottom: '1px dotted oklch(0.34 0.01 255)', height: 0 }} />
+              <span style={{ color: timeColor, transition: 'color .35s' }}>{t.time}</span>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* footer */}
+      <div style={{ padding: '12px 16px', marginTop: 8, borderTop: '1px solid oklch(0.3 0.01 255)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 12 }}>
+        <span style={{ color: GREEN }}>✓ {passed} passing</span>
+        <span style={{ ...s.muted }}>{failLine}</span>
+      </div>
+    </div>
+  )
+}
+
+function EmailLink({ href, children }: { href: string; children: React.ReactNode }) {
   const [hovered, setHovered] = useState(false)
   return (
     <a
@@ -121,9 +185,9 @@ function EmailLink({ href, accent, children }: { href: string; accent: string; c
         fontSize: 'clamp(26px, 3.6vw, 46px)',
         fontWeight: 600,
         letterSpacing: '-0.02em',
-        color: hovered ? accent : 'oklch(0.235 0.012 255)',
+        color: hovered ? ACCENT : 'oklch(0.235 0.012 255)',
         textDecoration: 'none',
-        borderBottom: `2px solid ${hovered ? accent : 'transparent'}`,
+        borderBottom: `2px solid ${hovered ? ACCENT : 'transparent'}`,
         transition: 'border-color 0.15s, color 0.15s',
       }}
     >
@@ -157,7 +221,7 @@ function CopyButton({ onClick, copied }: { onClick: () => void; copied: boolean 
   )
 }
 
-function FooterLink({ href, accent, children }: { href: string; accent: string; children: React.ReactNode }) {
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   const [hovered, setHovered] = useState(false)
   return (
     <a
@@ -167,7 +231,7 @@ function FooterLink({ href, accent, children }: { href: string; accent: string; 
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        color: hovered ? accent : 'oklch(0.4 0.01 255)',
+        color: hovered ? ACCENT : 'oklch(0.4 0.01 255)',
         textDecoration: 'none',
         transition: 'color 0.15s',
       }}
