@@ -1,48 +1,68 @@
-import { useState, useRef, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import FindComedyImg from './assets/FindComedy.png'
 import FightNightImg from './assets/FightNight.png'
-import TrollFaceImg  from './assets/Face Maker.png'
+import TrollFaceImg from './assets/Face Maker.png'
 
-const ACCENT = 'oklch(0.62 0.18 40)'
-const GREEN  = 'oklch(0.72 0.16 150)'
-const EMAIL  = 'ahsan97@hotmail.co.uk'
-
-const TESTS = [
-  { name: 'builds web apps',       time: '0.18s' },
-  { name: 'ships mobile apps',     time: '0.27s' },
-  { name: 'automates the QA',      time: '0.09s' },
-  { name: 'AI tooling & integration', time: '0.03s' },
-  { name: 'replies to your email', time: '0.04s' },
-]
+const EMAIL = 'ahsan97@hotmail.co.uk'
 
 const SKILLS: { label: string; tags: string[] }[] = [
-  { label: 'Languages',                tags: ['Java', 'TypeScript', 'JavaScript', 'Python', 'Ruby'] },
-  { label: 'Test automation',          tags: ['Playwright', 'Cypress', 'Selenium', 'Capybara', 'Cucumber · BDD'] },
-  { label: 'API, data & performance',  tags: ['REST Assured', 'Postman', 'SQL', 'MongoDB', 'Kafka', 'Elasticsearch / OpenSearch', 'JMeter', 'Gatling'] },
-  { label: 'CI/CD & cloud',            tags: ['GitHub Actions', 'Jenkins', 'Azure DevOps', 'Docker', 'AWS'] },
-  { label: 'Reporting',                tags: ['Jira Xray', 'Allure', 'Quality dashboards', 'Stakeholder metrics'] },
-  { label: 'AI',                       tags: ['Claude Code', 'MCP servers', 'LLM-driven test generation'] },
-  { label: 'Methodology',              tags: ['Agile / Scrum', '3 Amigos', 'Shift-Left', 'TDD / BDD'] },
+  {
+    label: 'Languages',
+    tags: ['Java', 'TypeScript', 'JavaScript', 'Python', 'Ruby'],
+  },
+  {
+    label: 'Test automation',
+    tags: ['Playwright', 'Cypress', 'Selenium', 'Capybara', 'Cucumber · BDD'],
+  },
+  {
+    label: 'API, data & performance',
+    tags: [
+      'REST Assured',
+      'Postman',
+      'SQL',
+      'MongoDB',
+      'Kafka',
+      'Elasticsearch / OpenSearch',
+      'JMeter',
+      'Gatling',
+    ],
+  },
+  {
+    label: 'CI/CD & cloud',
+    tags: ['GitHub Actions', 'Jenkins', 'Azure DevOps', 'Docker', 'AWS'],
+  },
+  {
+    label: 'Reporting',
+    tags: ['Jira Xray', 'Allure', 'Quality dashboards', 'Stakeholder metrics'],
+  },
+  {
+    label: 'AI',
+    tags: ['Claude Code', 'MCP servers', 'LLM-driven test generation'],
+  },
+  {
+    label: 'Methodology',
+    tags: ['Agile / Scrum', '3 Amigos', 'Shift-Left', 'TDD / BDD'],
+  },
 ]
 
 const PROJECTS = [
   {
     name: 'FindComedy',
-    img:  FindComedyImg,
+    img: FindComedyImg,
     desc: 'London comedy directory — performers find the right open-mic night in seconds.',
     href: 'https://github.com/AhsanZX97/FindComedy',
     stat: { value: '400+', label: 'visitors · launch week' },
   },
   {
     name: 'FightNight',
-    img:  FightNightImg,
+    img: FightNightImg,
     desc: 'Mobile app for tracking boxing, MMA, and combat sports events with reminders.',
     href: 'https://github.com/AhsanZX97/FightNight',
     stat: null,
   },
   {
     name: 'Facemaker',
-    img:  TrollFaceImg,
+    img: TrollFaceImg,
     desc: 'Browser game where you match a troll face and get rated via AI in 10 seconds.',
     href: 'https://github.com/AhsanZX97/Facemaker',
     stat: null,
@@ -50,293 +70,620 @@ const PROJECTS = [
 ]
 
 const EXPERIENCE = [
-  { title: 'Software Developer in Test', company: "Moody's Corporation",  years: '2024 — 2026' },
-  { title: 'QA Engineer',               company: 'Solirius Consulting',   years: '2020 — 2024' },
+  {
+    title: 'Software Developer in Test',
+    company: "Moody's Corporation",
+    years: '2024 — 2026',
+  },
+  {
+    title: 'QA Engineer',
+    company: 'Solirius Consulting',
+    years: '2020 — 2024',
+  },
 ]
 
-const s = {
-  page:  { minHeight: '100vh', display: 'flex', flexDirection: 'column' as const, justifyContent: 'space-between', gap: 'clamp(28px, 5vh, 60px)', padding: 'clamp(26px, 4vw, 56px)', background: 'oklch(0.97 0.004 255)', color: 'oklch(0.235 0.012 255)', fontFamily: "'Space Grotesk', sans-serif" },
-  mono:  { fontFamily: "'IBM Plex Mono', monospace" },
-  muted: { color: 'oklch(0.5 0.01 255)' },
+const STAGES = [
+  {
+    id: 'bio',
+    label: 'Biography',
+    file: 'biography.md',
+    hint: 'Meet the engineer',
+    icon: 'person',
+  },
+  {
+    id: 'skills',
+    label: 'Skills',
+    file: 'skills.config.ts',
+    hint: 'Inspect the toolkit',
+    icon: 'tools',
+  },
+  {
+    id: 'experience',
+    label: 'Experience',
+    file: 'experience.log',
+    hint: 'Trace the journey',
+    icon: 'history',
+  },
+  {
+    id: 'work',
+    label: 'Selected work',
+    file: 'releases',
+    hint: 'Explore the projects',
+    icon: 'box',
+  },
+] as const
+type Stage = (typeof STAGES)[number]['id']
+type IconName =
+  | 'person'
+  | 'tools'
+  | 'history'
+  | 'box'
+  | 'branch'
+  | 'workflow'
+  | 'arrow'
+  | 'code'
+  | 'check'
+  | 'mail'
+
+function Icon({
+  name,
+  className = '',
+}: {
+  name: IconName
+  className?: string
+}) {
+  const paths: Record<IconName, React.ReactNode> = {
+    person: (
+      <>
+        <circle cx="12" cy="8" r="3" />
+        <path d="M5 21v-3a7 7 0 0 1 14 0v3" />
+      </>
+    ),
+    tools: (
+      <path d="m4 4 16 16M20 4 4 20M3 7l4-4m10 18 4-4M17 3l4 4M3 17l4 4" />
+    ),
+    history: <path d="M3 11a9 9 0 1 1 2 7M3 4v7h7M12 7v5l3 2" />,
+    box: (
+      <path d="m12 3 9 5v9l-9 5-9-5V8l9-5Zm0 10 9-5M12 13 3 8m9 5v9M7 5.8l9 5" />
+    ),
+    branch: (
+      <>
+        <circle cx="6" cy="5" r="2" />
+        <circle cx="6" cy="19" r="2" />
+        <circle cx="18" cy="5" r="2" />
+        <path d="M6 7v10m12-10a10 10 0 0 1-10 10H6" />
+      </>
+    ),
+    workflow: (
+      <>
+        <rect x="3" y="3" width="6" height="6" rx="1" />
+        <rect x="15" y="15" width="6" height="6" rx="1" />
+        <path d="M6 9v9h9M9 6h9v9" />
+      </>
+    ),
+    arrow: <path d="M5 12h14m-5-5 5 5-5 5" />,
+    code: <path d="m8 6-6 6 6 6m8-12 6 6-6 6M14 3l-4 18" />,
+    check: <path d="m5 12 4 4L19 6" />,
+    mail: (
+      <>
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="m3 6 9 7 9-7" />
+      </>
+    ),
+  }
+  return (
+    <svg
+      className={`icon ${className}`}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name]}
+    </svg>
+  )
 }
 
 export default function App() {
-  const [copied, setCopied] = useState(false)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  function copyEmail() {
-    navigator.clipboard?.writeText(EMAIL).catch(() => {})
-    setCopied(true)
-    if (timerRef.current) clearTimeout(timerRef.current)
-    timerRef.current = setTimeout(() => setCopied(false), 1600)
-  }
-
+  const [stage, setStage] = useState<Stage>('bio')
+  const [explored, setExplored] = useState<string[]>([])
+  const selected = STAGES.find((item) => item.id === stage)!
   return (
-    <>
-      {/* ── Hero ── */}
-      <div style={s.page}>
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, ...s.mono, fontSize: 12, letterSpacing: '0.14em', textTransform: 'uppercase', ...s.muted }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, border: '1px solid oklch(0.235 0.012 255)', fontWeight: 500, letterSpacing: 0, color: 'oklch(0.235 0.012 255)' }}>AZ</span>
-            <span>Ahsan&nbsp;Zia</span>
-            <span style={{ color: 'oklch(0.78 0.008 255)' }}>/</span>
-            <span>Freelance</span>
-          </div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 9, border: '1px solid oklch(0.86 0.006 255)', borderRadius: 999, padding: '8px 15px', ...s.mono, fontSize: 11.5, letterSpacing: '0.06em', color: 'oklch(0.4 0.01 255)', background: 'oklch(0.99 0.003 255)' }}>
-            <span style={{ width: 7, height: 7, borderRadius: '50%', background: ACCENT, animation: 'az-pulse 2.4s ease-in-out infinite', display: 'inline-block' }} />
-            Available for freelance — June 2026
-          </div>
-        </header>
-
-        <main style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1.45fr) minmax(240px, 0.95fr)', gap: 'clamp(32px, 5vw, 80px)', alignItems: 'center' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(18px, 2.4vw, 30px)' }}>
-            <div style={{ ...s.mono, fontSize: 13, letterSpacing: '0.04em', ...s.muted }}>Full-stack development · QA automation · AI Engineering</div>
-            <h1 style={{ margin: 0, fontWeight: 600, fontSize: 'clamp(54px, 8.6vw, 128px)', lineHeight: 0.92, letterSpacing: '-0.035em', fontFamily: "'Space Grotesk', sans-serif" }}>Ahsan Zia</h1>
-            <p style={{ margin: 0, maxWidth: '48ch', fontSize: 'clamp(16px, 1.4vw, 20px)', lineHeight: 1.5, color: 'oklch(0.42 0.01 255)' }}>
-              I build web and mobile apps end to end — then write the automated tests that keep them from breaking. One person, the whole pipeline: from prototype, to production, to the QA that holds it together.
-            </p>
-          </div>
-          <TestRunner />
-        </main>
-
-        <footer style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 28, flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ ...s.mono, fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase', ...s.muted }}>Let's work together</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
-              <EmailLink href={`mailto:${EMAIL}`} accent={ACCENT}>{EMAIL}</EmailLink>
-              <CopyButton onClick={copyEmail} copied={copied} borderColor="oklch(0.84 0.006 255)" color="oklch(0.4 0.01 255)" hoverBorder="oklch(0.5 0.01 255)" hoverColor="oklch(0.235 0.012 255)" />
-            </div>
-            <span style={{ ...s.mono, fontSize: 11.5, letterSpacing: '0.06em', color: 'oklch(0.58 0.01 255)' }}>↓ work · experience · skills</span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, ...s.mono, fontSize: 12, letterSpacing: '0.04em', ...s.muted, textAlign: 'right' }}>
-            <span>Remote · Available worldwide</span>
-            <div style={{ display: 'flex', gap: 14 }}>
-              <FooterLink href="https://github.com/ahsanzia" accent={ACCENT}>GitHub ↗</FooterLink>
-              <FooterLink href="https://linkedin.com/in/ahsanzia" accent={ACCENT}>LinkedIn ↗</FooterLink>
-            </div>
-          </div>
-        </footer>
+    <div className="portfolio">
+      <a className="skip-link" href="#portfolio-content">
+        Skip to portfolio content
+      </a>
+      <header className="site-header">
+        <div className="repo-identity">
+          <span className="avatar">AZ</span>
+          <span>
+            Ahsan Zia <span className="slash">/</span> <b>portfolio</b>
+          </span>
+          <span className="badge public-badge">Public</span>
+        </div>
+        <a className="button contact-button" href={`mailto:${EMAIL}`}>
+          <Icon name="mail" /> Get in touch
+        </a>
+      </header>
+      <div className="repo-nav">
+        <span className="repo-tab">
+          <Icon name="workflow" /> Portfolio workflow
+        </span>
+        <span className="repo-description">
+          Software development & quality engineering
+        </span>
+        <a href="https://github.com/AhsanZX97" target="_blank" rel="noreferrer">
+          GitHub ↗
+        </a>
       </div>
-
-      {/* ── 01 Selected work ── */}
-      <section style={{ padding: 'clamp(64px, 9vh, 120px) clamp(26px, 4vw, 56px)', borderTop: '1px solid oklch(0.9 0.006 255)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <SectionHeader num="01" label="Selected work" />
-          <h2 style={{ margin: '0 0 clamp(28px, 4vh, 48px)', fontSize: 'clamp(26px, 3vw, 38px)', fontWeight: 600, letterSpacing: '-0.02em', color: 'oklch(0.235 0.012 255)' }}>A few things I've built.</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: 24 }}>
-            {PROJECTS.map(p => (
-              <div key={p.name} style={{ border: '1px solid oklch(0.88 0.006 255)', borderRadius: 10, overflow: 'hidden', background: 'oklch(0.99 0.003 255)', display: 'flex', flexDirection: 'column' }}>
-                <img src={p.img} alt={p.name} style={{ width: '100%', aspectRatio: '16/10', objectFit: 'cover', display: 'block' }} />
-                <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                    <span style={{ fontSize: 20, fontWeight: 600, letterSpacing: '-0.01em' }}>{p.name}</span>
-                    <PlainLink href={p.href} accent={ACCENT} style={{ ...s.mono, fontSize: 15, color: 'oklch(0.45 0.01 255)' }} target="_blank">↗</PlainLink>
+      <main className="page-main" id="portfolio-content" tabIndex={-1}>
+        <div className="page-heading">
+          <div>
+            <div className="eyebrow">
+              <span className="status-dot" /> AVAILABLE FOR FREELANCE
+            </div>
+            <h1>
+              Good software.
+              <br className="mobile-break" /> Proven to work.
+            </h1>
+            <p>I build it. I test it. I help you ship it with confidence.</p>
+          </div>
+          <span className="branch-label">
+            <Icon name="branch" /> main
+          </span>
+        </div>
+        <section className="workflow" aria-label="Portfolio workflow">
+          <div className="workflow-heading">
+            <div>
+              <Icon name="workflow" />
+              <b>Explore my workflow</b>
+              <span className="badge">4 stages</span>
+            </div>
+            <span className="mono">portfolio.yml</span>
+          </div>
+          <nav className="pipeline" aria-label="Portfolio stages">
+            {STAGES.map((item, index) => (
+              <div className="pipeline-slot" key={item.id}>
+                <button
+                  className="job"
+                  type="button"
+                  aria-pressed={stage === item.id}
+                  aria-controls="stage-content"
+                  onClick={() => setStage(item.id)}
+                >
+                  <span className="job-icon">
+                    <Icon name={item.icon} />
+                  </span>
+                  <span>
+                    <strong>{item.label}</strong>
+                    <small>{item.hint}</small>
+                  </span>
+                  <span className="job-number">0{index + 1}</span>
+                </button>
+                {index < STAGES.length - 1 && (
+                  <span className="connector" aria-hidden="true">
+                    <Icon name="arrow" />
+                  </span>
+                )}
+              </div>
+            ))}
+          </nav>
+        </section>
+        <div className="section-meta">
+          <span>
+            <Icon name={selected.icon} /> {selected.label}
+            <span className="slash">/</span>
+            <span className="mono">{selected.file}</span>
+          </span>
+          <span className="section-hint">Select a stage to explore</span>
+        </div>
+        <div className="detail-grid" id="stage-content">
+          <section className="content-panel" aria-label={selected.label}>
+            {stage === 'bio' && (
+              <>
+                <div className="section-kicker">
+                  THE PERSON BEHIND THE PIPELINE
+                </div>
+                <h2>Hi, I'm Ahsan.</h2>
+                <p className="intro-copy">
+                  A developer with a tester's mindset.
+                </p>
+                <p className="body-copy">
+                  I build web and mobile apps end to end — then write the
+                  automated tests that keep them from breaking. From the first
+                  prototype to production, quality is part of the build.
+                </p>
+                <div className="tags">
+                  <span>Full-stack development</span>
+                  <span>QA automation</span>
+                  <span>AI engineering</span>
+                </div>
+                <div className="profile-note">
+                  <span className="mini-avatar">AZ</span>
+                  <div>
+                    <b>Ahsan Zia</b>
+                    <small>Remote · Available worldwide</small>
                   </div>
-                  <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.5, color: 'oklch(0.45 0.01 255)' }}>{p.desc}</p>
-                  {p.stat && (
-                    <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                      <span style={{ fontSize: 22, fontWeight: 600, color: ACCENT }}>{p.stat.value}</span>
-                      <span style={{ ...s.mono, fontSize: 12, ...s.muted }}>{p.stat.label}</span>
+                  <Icon name="check" />
+                </div>
+              </>
+            )}
+            {stage === 'skills' && (
+              <>
+                <div className="section-kicker">DEPENDENCIES, WELL CHOSEN</div>
+                <h2>The toolkit.</h2>
+                <p className="body-copy">
+                  The tools I use to build, investigate, automate, and deliver.
+                </p>
+                <div className="skills-list">
+                  {SKILLS.map((group) => (
+                    <div className="skill-group" key={group.label}>
+                      <h3>{group.label}</h3>
+                      <div className="tags">
+                        {group.tags.map((tag) => (
+                          <span key={tag}>{tag}</span>
+                        ))}
+                      </div>
                     </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 02 Experience ── */}
-      <section style={{ padding: 'clamp(64px, 9vh, 120px) clamp(26px, 4vw, 56px)', borderTop: '1px solid oklch(0.9 0.006 255)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <SectionHeader num="02" label="Experience" />
-          <h2 style={{ margin: '0 0 clamp(20px, 3vh, 36px)', fontSize: 'clamp(26px, 3vw, 38px)', fontWeight: 600, letterSpacing: '-0.02em', color: 'oklch(0.235 0.012 255)' }}>Where I've done it.</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', borderTop: '1px solid oklch(0.88 0.006 255)' }}>
-            {EXPERIENCE.map(e => (
-              <div key={e.company} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 20, padding: '22px 0', borderBottom: '1px solid oklch(0.88 0.006 255)', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <span style={{ fontSize: 'clamp(18px, 1.7vw, 22px)', fontWeight: 600, letterSpacing: '-0.01em' }}>{e.title}</span>
-                  <span style={{ fontSize: 14.5, ...s.muted }}>{e.company}</span>
-                </div>
-                <span style={{ ...s.mono, fontSize: 13, ...s.muted, whiteSpace: 'nowrap' }}>{e.years}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 03 Skills & tools ── */}
-      <section style={{ padding: 'clamp(64px, 9vh, 120px) clamp(26px, 4vw, 56px) clamp(72px, 11vh, 130px)', borderTop: '1px solid oklch(0.9 0.006 255)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <SectionHeader num="03" label="Skills & tools" />
-          <h2 style={{ margin: '0 0 clamp(28px, 4vh, 48px)', fontSize: 'clamp(26px, 3vw, 38px)', fontWeight: 600, letterSpacing: '-0.02em', color: 'oklch(0.235 0.012 255)' }}>The toolkit.</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 'clamp(28px, 3vw, 44px)' }}>
-            {SKILLS.map(group => (
-              <div key={group.label} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <span style={{ ...s.mono, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', ...s.muted }}>{group.label}</span>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {group.tags.map(tag => (
-                    <span key={tag} style={{ display: 'inline-flex', padding: '6px 11px', border: '1px solid oklch(0.88 0.006 255)', borderRadius: 6, fontSize: 13, color: 'oklch(0.35 0.01 255)', background: 'oklch(0.99 0.003 255)' }}>{tag}</span>
                   ))}
                 </div>
-              </div>
-            ))}
+              </>
+            )}
+            {stage === 'experience' && (
+              <>
+                <div className="section-kicker">EXPERIENCE IN PRODUCTION</div>
+                <h2>Where I've done it.</h2>
+                <p className="body-copy">
+                  Quality engineering, from consulting to financial technology.
+                </p>
+                <div className="experience-list">
+                  {EXPERIENCE.map((job, index) => (
+                    <article className="experience-item" key={job.company}>
+                      <span className="company-avatar">
+                        {index === 0 ? 'M' : 'S'}
+                      </span>
+                      <div>
+                        <span className="mono">{job.years}</span>
+                        <h3>{job.title}</h3>
+                        <p>{job.company}</p>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+                <div className="quiet-note">
+                  <Icon name="branch" />
+                  <span>
+                    A career built around making software more reliable.
+                  </span>
+                </div>
+              </>
+            )}
+            {stage === 'work' && (
+              <>
+                <div className="section-kicker">SELECTED RELEASES</div>
+                <h2>Built. Tested. Shipped.</h2>
+                <div className="projects">
+                  {PROJECTS.map((project) => (
+                    <a
+                      className="project"
+                      key={project.name}
+                      href={project.href}
+                      aria-label={`View ${project.name} on GitHub`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <img src={project.img} alt="" />
+                      <div>
+                        <h3>
+                          {project.name} <span>↗</span>
+                        </h3>
+                        <p>{project.desc}</p>
+                        {project.stat && (
+                          <small>
+                            {project.stat.value} {project.stat.label}
+                          </small>
+                        )}
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </>
+            )}
+          </section>
+          <div className="companion-column">
+            {stage === 'bio' && <TestRunner />}
+            {stage === 'skills' && (
+              <section className="tool-panel" aria-label="Test design matrix">
+                <ToolHeading
+                  icon="tools"
+                  title="Test design matrix"
+                  badge="PLANNING"
+                />
+                <div className="tool-body">
+                  <h3>Start with the right question.</h3>
+                  <p className="tool-description">
+                    A good test strategy goes beyond automation.
+                  </p>
+                  <table className="test-matrix">
+                    <thead>
+                      <tr>
+                        <th>Question</th>
+                        <th>Approach</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Does it work?</td>
+                        <td>Functional testing</td>
+                      </tr>
+                      <tr>
+                        <td>What could break?</td>
+                        <td>Exploratory testing</td>
+                      </tr>
+                      <tr>
+                        <td>Will it stay working?</td>
+                        <td>Regression testing</td>
+                      </tr>
+                      <tr>
+                        <td>Is it the right thing?</td>
+                        <td>Acceptance criteria</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div className="tool-footnote">
+                    Human curiosity + repeatable checks.
+                  </div>
+                </div>
+              </section>
+            )}
+            {stage === 'experience' && (
+              <section
+                className="tool-panel"
+                aria-label="Career release history"
+              >
+                <ToolHeading
+                  icon="history"
+                  title="Career release history"
+                  badge="TIMELINE"
+                />
+                <div className="tool-body">
+                  <ol className="release-history">
+                    {EXPERIENCE.map((job) => (
+                      <li key={job.company}>
+                        <span className="mono">{job.years}</span>
+                        <h3>{job.company}</h3>
+                        <p>{job.title}</p>
+                        <span className="history-tag">Career milestone</span>
+                      </li>
+                    ))}
+                  </ol>
+                  <div className="tool-footnote">
+                    The people and places behind the practice.
+                  </div>
+                </div>
+              </section>
+            )}
+            {stage === 'work' && (
+              <ExploratorySession explored={explored} onChange={setExplored} />
+            )}
+            <div className="companion-caption">
+              <Icon name="code" />
+              <span>
+                {stage === 'bio'
+                  ? 'Thoughtful builds. Confident releases.'
+                  : stage === 'skills'
+                    ? 'The right technique for the right risk.'
+                    : stage === 'experience'
+                      ? 'Every chapter adds to the toolkit.'
+                      : 'Real users rarely follow the happy path.'}
+              </span>
+            </div>
           </div>
         </div>
-      </section>
-
-      {/* ── 04 Contact (dark) ── */}
-      <section style={{ padding: 'clamp(76px, 12vh, 150px) clamp(26px, 4vw, 56px)', borderTop: '1px solid oklch(0.9 0.006 255)', background: 'oklch(0.205 0.012 255)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, ...s.mono, fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'oklch(0.6 0.01 255)' }}>
-            <span style={{ color: ACCENT }}>04</span>
-            <span>Contact</span>
-            <span style={{ flex: 1, height: 1, background: 'oklch(0.32 0.01 255)' }} />
-          </div>
-          <h2 style={{ margin: 0, fontSize: 'clamp(34px, 5.5vw, 72px)', fontWeight: 600, letterSpacing: '-0.03em', lineHeight: 1.02, color: 'oklch(0.96 0.004 255)' }}>
-            Let's build<br />something solid.
-          </h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap', marginTop: 10 }}>
-            <EmailLink href={`mailto:${EMAIL}`} accent={ACCENT} dark>{EMAIL}</EmailLink>
-            <CopyButton onClick={copyEmail} copied={copied} borderColor="oklch(0.36 0.01 255)" color="oklch(0.72 0.01 255)" hoverBorder="oklch(0.6 0.01 255)" hoverColor="oklch(0.95 0.004 255)" />
-          </div>
+      </main>
+      <footer className="site-footer">
+        <Contact />
+        <div className="footer-links">
+          <span>Remote · Available worldwide</span>
+          <a
+            href="https://github.com/AhsanZX97"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub ↗
+          </a>
+          <a
+            href="https://linkedin.com/in/ahsanzia"
+            target="_blank"
+            rel="noreferrer"
+          >
+            LinkedIn ↗
+          </a>
         </div>
-      </section>
-    </>
+      </footer>
+    </div>
   )
 }
 
-// ── Shared components ────────────────────────────────────────────
+function ToolHeading({
+  icon,
+  title,
+  badge,
+}: {
+  icon: IconName
+  title: string
+  badge: string
+}) {
+  return (
+    <div className="tool-heading">
+      <span>
+        <Icon name={icon} />
+        {title}
+      </span>
+      <span className="tool-badge">{badge}</span>
+    </div>
+  )
+}
+
+function Contact() {
+  const [message, setMessage] = useState('')
+  async function copyEmail() {
+    try {
+      await navigator.clipboard.writeText(EMAIL)
+      setMessage('Email copied')
+    } catch {
+      setMessage(
+        'Could not copy. Select the email address to copy it manually.',
+      )
+    }
+  }
+  return (
+    <div>
+      <span className="eyebrow">LET'S BUILD SOMETHING SOLID</span>
+      <div className="contact-row">
+        <a className="email-link" href={`mailto:${EMAIL}`}>
+          {EMAIL} <span>↗</span>
+        </a>
+        <button className="button" type="button" onClick={copyEmail}>
+          Copy email
+        </button>
+      </div>
+      <span
+        className="copy-status"
+        role="status"
+        aria-label="Email copy status"
+      >
+        {message}
+      </span>
+    </div>
+  )
+}
+
+const EXPLORATIONS = [
+  { label: 'Discover an event', prompt: 'Is the next step clear?' },
+  {
+    label: 'Try an unexpected path',
+    prompt: 'What happens when nothing matches?',
+  },
+  {
+    label: 'Explore on a small screen',
+    prompt: 'Can you still find the details?',
+  },
+]
+
+function ExploratorySession({
+  explored,
+  onChange,
+}: {
+  explored: string[]
+  onChange: (value: string[]) => void
+}) {
+  return (
+    <section className="tool-panel" aria-label="Exploratory session">
+      <ToolHeading icon="check" title="Exploratory session" badge="MANUAL" />
+      <div className="tool-body">
+        <h3>Follow your curiosity.</h3>
+        <p className="tool-description">
+          Sample charter / FindComedy
+          <br />
+          Explore how someone finds their next open mic.
+        </p>
+        <div className="checklist">
+          {EXPLORATIONS.map((item) => (
+            <label key={item.label}>
+              <input
+                type="checkbox"
+                checked={explored.includes(item.label)}
+                onChange={(event) =>
+                  onChange(
+                    event.target.checked
+                      ? [...explored, item.label]
+                      : explored.filter((value) => value !== item.label),
+                  )
+                }
+              />
+              <span>
+                {item.label}
+                <small>{item.prompt}</small>
+              </span>
+            </label>
+          ))}
+        </div>
+        <div className="checklist-footer">
+          <span role="status">{explored.length} / 3 explored</span>
+          <button
+            className="text-button"
+            type="button"
+            onClick={() => onChange([])}
+          >
+            Reset checklist
+          </button>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+const PROFILE_TESTS = [
+  'builds web apps',
+  'ships mobile apps',
+  'automates the QA',
+  'connects AI tools',
+]
 
 function TestRunner() {
-  const [passed,  setPassed]  = useState(0)
-  const [running, setRunning] = useState(-1)
-  const [done,    setDone]    = useState(false)
-  const ct = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [passed, setPassed] = useState(PROFILE_TESTS.length)
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([])
+  const running = passed < PROFILE_TESTS.length
+  useEffect(() => () => timers.current.forEach(clearTimeout), [])
 
-  useEffect(() => {
-    ct.current = setTimeout(cycle, 700)
-    return () => { if (ct.current) clearTimeout(ct.current) }
-  }, [TESTS.length])
-
-  function cycle() {
-    setPassed(0); setRunning(-1); setDone(false)
-    let i = 0
-    function step() {
-      if (i >= TESTS.length) {
-        setRunning(-1); setDone(true)
-        ct.current = setTimeout(cycle, 3800)
-        return
-      }
-      setRunning(i)
-      ct.current = setTimeout(() => {
-        setPassed(i + 1); setRunning(-1)
-        i++
-        ct.current = setTimeout(step, 240)
-      }, 480)
-    }
-    ct.current = setTimeout(step, 500)
+  function replay() {
+    timers.current.forEach(clearTimeout)
+    setPassed(0)
+    timers.current = PROFILE_TESTS.map((_, index) =>
+      setTimeout(() => setPassed(index + 1), (index + 1) * 450),
+    )
   }
 
-  const statusLabel = done ? 'PASS' : 'RUNS'
-  const statusColor = done ? GREEN : ACCENT
-
   return (
-    <div style={{ width: '100%', maxWidth: 440, marginLeft: 'auto', background: 'oklch(0.205 0.012 255)', borderRadius: 8, overflow: 'hidden', fontFamily: "'IBM Plex Mono', monospace", boxShadow: '0 22px 48px -28px oklch(0.2 0.02 255 / 0.55)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 16px', borderBottom: '1px solid oklch(0.3 0.01 255)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ display: 'flex', gap: 6 }}>
-            <span style={{ width: 9, height: 9, borderRadius: '50%', background: 'oklch(0.55 0.13 30)' }} />
-            <span style={{ width: 9, height: 9, borderRadius: '50%', background: 'oklch(0.62 0.1 90)' }} />
-            <span style={{ width: 9, height: 9, borderRadius: '50%', background: 'oklch(0.62 0.11 150)' }} />
-          </span>
-          <span style={{ fontSize: 12, color: 'oklch(0.6 0.01 255)' }}>ahsan.test.ts</span>
+    <section className="tool-panel terminal" aria-label="Profile test runner">
+      <ToolHeading icon="code" title="ahsan.test.ts" badge="DEMO" />
+      <div className="terminal-body">
+        <p className="terminal-command">
+          <span>$</span> npm run test:profile
+        </p>
+        <p className="terminal-suite">
+          {running ? '›' : '✓'} your next engineer
+        </p>
+        {PROFILE_TESTS.map((test, index) => (
+          <div
+            className={`test-line ${index >= passed ? 'test-pending' : ''}`}
+            key={test}
+          >
+            <span className="line-number">0{index + 1}</span>
+            <span className="test-pass">
+              {index < passed ? '✓' : index === passed ? '›' : '·'}
+            </span>
+            <span>{test}</span>
+          </div>
+        ))}
+        <div className="terminal-summary">
+          <b role="status">{passed} passing</b>
+          <span>Profile illustration</span>
         </div>
-        <span style={{ fontSize: 10, letterSpacing: '0.14em', padding: '3px 9px', borderRadius: 4, color: statusColor, border: `1px solid ${statusColor}`, transition: 'color .35s, border-color .35s' }}>{statusLabel}</span>
+        <button
+          className="replay-button"
+          type="button"
+          onClick={replay}
+          disabled={running}
+        >
+          <Icon name="history" />
+          {running ? 'Running…' : 'Re-run demo'}
+        </button>
       </div>
-      <div style={{ padding: '18px 16px 8px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {TESTS.map((t, i) => {
-          const status    = i < passed ? 'pass' : i === running ? 'run' : 'pending'
-          const icon      = status === 'pass' ? '✓' : status === 'run' ? '▸' : '·'
-          const iconColor = status === 'pass' ? GREEN : status === 'run' ? ACCENT : 'oklch(0.45 0.01 255)'
-          const nameColor = status === 'pending' ? 'oklch(0.5 0.01 255)' : 'oklch(0.85 0.005 255)'
-          const timeColor = status === 'pass' ? 'oklch(0.62 0.01 255)' : 'oklch(0.4 0.01 255)'
-          return (
-            <div key={t.name} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13 }}>
-              <span style={{ width: 14, textAlign: 'center', color: iconColor, transition: 'color .35s' }}>{icon}</span>
-              <span style={{ color: nameColor, transition: 'color .35s', whiteSpace: 'nowrap' }}>{t.name}</span>
-              <span style={{ flex: 1, borderBottom: '1px dotted oklch(0.34 0.01 255)', height: 0 }} />
-              <span style={{ color: timeColor, transition: 'color .35s' }}>{t.time}</span>
-            </div>
-          )
-        })}
-      </div>
-      <div style={{ padding: '12px 16px', marginTop: 8, borderTop: '1px solid oklch(0.3 0.01 255)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 12 }}>
-        <span style={{ color: GREEN }}>✓ {passed} passing</span>
-        <span style={{ color: 'oklch(0.5 0.01 255)' }}>{done ? '0 failing · 0.58s' : 'running…'}</span>
-      </div>
-    </div>
-  )
-}
-
-function SectionHeader({ num, label }: { num: string; label: string }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 14, fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'oklch(0.5 0.01 255)', marginBottom: 16 }}>
-      <span style={{ color: ACCENT }}>{num}</span>
-      <span>{label}</span>
-      <span style={{ flex: 1, height: 1, background: 'oklch(0.88 0.006 255)' }} />
-    </div>
-  )
-}
-
-function EmailLink({ href, accent, dark, children }: { href: string; accent: string; dark?: boolean; children: React.ReactNode }) {
-  const [hovered, setHovered] = useState(false)
-  const base = dark ? 'oklch(0.96 0.004 255)' : 'oklch(0.235 0.012 255)'
-  return (
-    <a
-      href={href}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{ fontSize: 'clamp(22px, 3vw, 40px)', fontWeight: 600, letterSpacing: '-0.02em', color: hovered ? accent : base, textDecoration: 'none', borderBottom: `2px solid ${hovered ? accent : 'transparent'}`, transition: 'border-color 0.15s, color 0.15s' }}
-    >
-      {children}
-    </a>
-  )
-}
-
-function CopyButton({ onClick, copied, borderColor, color, hoverBorder, hoverColor }: {
-  onClick: () => void; copied: boolean
-  borderColor: string; color: string; hoverBorder: string; hoverColor: string
-}) {
-  const [hovered, setHovered] = useState(false)
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{ cursor: 'pointer', fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: '0.04em', color: hovered ? hoverColor : color, background: 'transparent', border: `1px solid ${hovered ? hoverBorder : borderColor}`, borderRadius: 999, padding: '8px 14px', transition: 'border-color 0.15s, color 0.15s' }}
-    >
-      {copied ? 'Copied ✓' : 'Copy'}
-    </button>
-  )
-}
-
-function FooterLink({ href, accent, children }: { href: string; accent: string; children: React.ReactNode }) {
-  const [hovered, setHovered] = useState(false)
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-      style={{ color: hovered ? accent : 'oklch(0.4 0.01 255)', textDecoration: 'none', transition: 'color 0.15s' }}>
-      {children}
-    </a>
-  )
-}
-
-function PlainLink({ href, accent, style, target, children }: { href: string; accent: string; style?: React.CSSProperties; target?: string; children: React.ReactNode }) {
-  const [hovered, setHovered] = useState(false)
-  return (
-    <a href={href} target={target} rel={target === '_blank' ? 'noopener noreferrer' : undefined} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-      style={{ ...style, color: hovered ? accent : (style?.color as string), textDecoration: 'none', transition: 'color 0.15s' }}>
-      {children}
-    </a>
+    </section>
   )
 }
